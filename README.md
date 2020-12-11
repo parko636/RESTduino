@@ -134,10 +134,6 @@ Whatever the reason, if you can't ping the board you can try configuring it's ne
 
 In the Arduino software, modify the following lines to match your network setup:
 
-    byte mac[]={0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
-
-This line sets the MAC address of your ethernet board; if your board has one written on it, you should use that instead.
-
     #define STATICIP true
 
 This line disables automatic network configuration and uses the IP address you'll configure in the next step.

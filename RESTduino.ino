@@ -15,6 +15,9 @@
  
  added 10/16/2011
  by Edward M. Goldberg - Optional Debug flag
+
+ added 2020-12-11
+ by Alex Parkinson - Randomise MAC address on first run and save to EEPROM
  
  */
 
@@ -24,10 +27,14 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include <EthernetBonjour.h>
+#include <EEPROM.h>
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
-byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+byte mac[6] = { 0xBE, 0xEF, 0x00, 0x00, 0x00, 0x00 };
+#if DEBUG
+char macstr[18];
+#endif
 
 #if STATICIP
 byte ip[] = {10,0,1,100};
@@ -47,6 +54,26 @@ void setup()
 #if DEBUG
   //  turn on serial (for debuggin)
   Serial.begin(9600);
+#endif
+
+  // Random MAC address stored in EEPROM
+  if (EEPROM.read(1) == '#') {
+    for (int i = 2; i < 6; i++) {
+      mac[i] = EEPROM.read(i);
+    }
+  } else {
+    randomSeed(analogRead(0));
+    for (int i = 2; i < 6; i++) {
+      mac[i] = random(0, 255);
+      EEPROM.write(i, mac[i]);
+    }
+    EEPROM.write(1, '#');
+  }
+
+#if DEBUG
+  snprintf(macstr, 18, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  Serial.print("MAC: ");
+  Serial.println(macstr);
 #endif
 
   // start the Ethernet connection and the server:
@@ -296,4 +323,3 @@ void loop()
     }
   }
 }
-
