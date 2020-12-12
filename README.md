@@ -1,5 +1,12 @@
 # RESTduino
 
+This is a fork of [jjg/RESTduino](https://github.com/jjg/RESTduino). Main changes from upstream are:
+
+* MAC address is randomly generated on first run and stored to EEPROM for persistence. This removes the need to specify a MAC address, especially useful if you plan to run multiple RESTduino's on one network.
+* Uses correct content type header for JSON responses.
+* Reading a digital pin no longer sets the pin to input if it had previously been set to output. This preserves the output state and allows a remote service to query the state without inadvertantly changing output voltage.
+* Added pin mode to response body.
+
 RESTduino is a simple Arduino sketch that provides a REST-like interface to Arduino equipped with a network interface.  The idea is to allow developers familiar with interacting with REST services a comfortable way to control physical devices using an Arduino (without having to write any Arduino code).
 
 You can see a crude demo video on YouTube here: http://www.youtube.com/watch?v=X-s2se-34-g
@@ -18,13 +25,7 @@ To use RESTduino you'll need some hardware, minimally:
 * An Arduino
 * An Arduino network interface
 
-RESTduino was originally designed to work with the Arduino Uno and the Arduino Ethernet Shield, but since that time a number of Arduino-compatible boards with built-in network hardware have appeard.  It should be possible to make any Arduino-Uno compatible board with a network interface work with RESTduino, but the boards listed below have been tested and confirmed to work:
-
-* WildFire (comes with RESTduino preinstalled) http://shop.wickeddevice.com/product/wildfire/
-
-*note: if you have confirmed that RESTduino runs on additional boards, please issue a pull request to update this list, or create an [Issue](https://github.com/jjg/RESTduino/issues) with the details so I can add it, thanks!*
-
-If you've never worked with an Arduino before (and have no interest in learning how to program one) I highly recommend starting with a board that comes with RESTduino preinstalled.
+RESTduino was originally designed to work with the Arduino Uno and the Arduino Ethernet Shield, but since that time a number of Arduino-compatible boards with built-in network hardware have appeard.  It should be possible to make any Arduino-Uno compatible board with a network interface work with RESTduino.
 
 ### Installation
 
@@ -43,7 +44,7 @@ To install RESTduino on your hardware you'll need:
 
 Clone the RESTduino repository to get a copy of the code:
 
-     git clone https://github.com/jjg/RESTduino.git
+     git clone https://github.com/parko636/RESTduino.git
 
 Add the custom Bonjour library to your Arduino software:
 
@@ -57,7 +58,7 @@ Build RESTduino:
 1.  Open the RESTduino.ino file inside the RESTduino directory
 2.  Select Sketch -> Verify/Compile
 
-Near the bottom of the Arduino software window you should see the message "Done compiling".  If not, run through the steps above and try again, or if you're at a loss post an [Issue here](https://github.com/jjg/RESTduino/issues) with the message you did receive and we'll try to sort it out.
+Near the bottom of the Arduino software window you should see the message "Done compiling".  If not, run through the steps above and try again, or if you're at a loss post an [Issue here](https://github.com/parko636/RESTduino/issues) with the message you did receive and we'll try to sort it out.
 
 Once the code compiles you're ready to install it on your hardware.  Connect the board with the USB cable and make sure the correct board and serial port are selected in the Arduino software (these will be the same settings you used to install the Blink sketch earlier).
 
@@ -105,7 +106,7 @@ Reading pins works just like setting them but you leave off the value.  So for e
 
 will return a JSON-formatted result like this:
 
-    {"D9":"LOW"}
+    {"pin":"D9","mode":"input","value":"LOW"}
 
 This isn't very interesting with an LED attached to pin 9, but if you attach a switch instead the value returned will reflect the position of the switch (HIGH when the switch is on, LOW when the switch is off).  
 
@@ -117,7 +118,7 @@ Reading an analog pin is just like reading a digital one but with a different na
 
 which returns:
 
-    {"A0":"432"}
+    {"pin":"A0","mode":"input","value":"432"}
 
 Analog pins can't be set to a value (they are input-only); if you need to output an "analog" value, use the PWM pins discussed earlier.
 
@@ -146,4 +147,4 @@ Once these changes have been made, compile and upload RESTduino as described abo
 
     ping 192.168.1.177
 
-If this works you should be able to access the pins using the requests documented above by replacing `restduino.local` with the IP address you manually configured.  If the ping fails again there is something other than an autocofiguration failure to blame, double-check the underlying network connection (Ethernet cables, WiFi configuration etc.) and if you still can't make a connection, post the details in an [Issue](https://github.com/jjg/RESTduino/issues) and we'll try to help you out.
+If this works you should be able to access the pins using the requests documented above by replacing `restduino.local` with the IP address you manually configured.  If the ping fails again there is something other than an autocofiguration failure to blame, double-check the underlying network connection (Ethernet cables, WiFi configuration etc.) and if you still can't make a connection, post the details in an [Issue](https://github.com/parko636/RESTduino/issues) and we'll try to help you out.
